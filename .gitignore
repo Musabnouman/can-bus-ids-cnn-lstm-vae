@@ -1,0 +1,26 @@
+# Datasets are not redistributed here; download them from the official sources (see README)
+data/
+*.csv
+*.log
+*.txt
+capture_metadata.json
+
+# MAT-files: dataset caches (ambient_diverse_30pct.mat) and score dumps (rawscores_*.mat)
+*.mat
+
+# Figures written by the scripts
+PR_*.png
+PR_*.pdf
+ROC_*.png
+ROC_*.pdf
+
+# MATLAB
+*.asv
+*.autosave
+*.mex*
+slprj/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
