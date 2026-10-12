@@ -1,3 +1,9 @@
+% PAYLOAD_VAE_ROAD  Payload-byte CNN-LSTM VAE, ROAD version.
+%   Same model as payload_vae.m with the ROAD loader (labels from
+%   capture_metadata.json), mRMR ranking of the 8 payload bytes and a
+%   window stride of 8. Also keeps the 'CIC' and 'CARHACK' loaders.
+%   Needs ambient_diverse_30pct.mat from prep/road_ambient_payload.m.
+
 %% ==========================================
 % 0. CONFIGURATION & LOADING
 % ==========================================

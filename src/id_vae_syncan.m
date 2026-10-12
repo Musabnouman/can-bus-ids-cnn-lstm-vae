@@ -1,3 +1,8 @@
+% ID_VAE_SYNCAN  CAN-ID embedding CNN-LSTM VAE (see id_vae_road.m), SynCAN dataset.
+%   Benign traffic: SynCAN training file(s), 30% of each kept as ten evenly
+%   spaced chunks. Attack frames: rows labelled 1 in the test file.
+%   SynCAN signals are already in [0,1] and are not rescaled.
+
 %% ==========================================
 % 0. CONFIGURATION & LOADING
 % ==========================================

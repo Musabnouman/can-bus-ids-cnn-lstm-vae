@@ -1,3 +1,7 @@
+% ROAD_AMBIENT_WITH_ID  Build the benign ROAD matrix for id_vae_road.m.
+%   Same as road_ambient_payload.m but keeps the CAN ID as a 9th column
+%   and saves new_ambient_diverse_30pct.mat in the current folder.
+
 %% ==========================================
 % ROAD DATASET: AMBIENT CONCATENATOR (9 FEATURES - INCLUDES ID)
 % ==========================================

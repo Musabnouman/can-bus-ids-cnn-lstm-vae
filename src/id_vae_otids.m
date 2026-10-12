@@ -1,3 +1,8 @@
+% ID_VAE_OTIDS  CAN-ID embedding CNN-LSTM VAE (see id_vae_road.m), OTIDS dataset.
+%   Benign traffic: Attack_free_dataset.txt. Attack frames are labelled
+%   from the capture itself: DoS = ID 0x000; impersonation = ID 0x164 from
+%   250 s on; fuzzy = every frame from 250 s on.
+
 %% ==========================================
 % 0. CONFIGURATION & LOADING
 % ==========================================

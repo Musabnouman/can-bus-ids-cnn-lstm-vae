@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite it as below."
+title: "CAN-bus intrusion detection with a CNN-LSTM variational autoencoder"
+type: software
+authors:
+  - given-names: Musab
+    family-names: Nouman
+repository-code: "https://github.com/Musabnouman/can-bus-ids-cnn-lstm-vae"
+license: MIT
+version: 0.1.0
+date-released: "2026-10-12"
+keywords:
+  - intrusion detection
+  - CAN bus
+  - in-vehicle network
+  - anomaly detection
+  - variational autoencoder
+  - CNN-LSTM
+  - MATLAB

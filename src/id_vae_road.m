@@ -1,3 +1,12 @@
+% ID_VAE_ROAD  CNN-LSTM VAE with a learned CAN-ID embedding, ROAD dataset.
+%   Each frame is a 16-d embedding of its CAN ID (vocabulary built from
+%   benign traffic, one extra row for IDs never seen there) followed by the
+%   8 payload bytes scaled to [0,1]. The model predicts frame 32 from
+%   frames 1-31. Score = weighted prediction error + KL term + a penalty
+%   times the fraction of unseen IDs in the window; the script reports
+%   results for penalties 0 to 5.
+%   Needs new_ambient_diverse_30pct.mat from prep/road_ambient_with_id.m.
+
 %% ==========================================
 % 0. CONFIGURATION & LOADING
 % ==========================================

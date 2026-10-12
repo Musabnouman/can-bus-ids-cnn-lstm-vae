@@ -1,3 +1,14 @@
+% PAYLOAD_VAE  CNN-LSTM VAE with self-attention for CAN-bus intrusion detection.
+%   Each CAN frame is described by its 8 payload bytes (the CAN ID is not
+%   used). The model reads frames 1-31 of a 32-frame window and predicts
+%   frame 32; the anomaly score is the prediction error plus a weighted KL
+%   term. It is trained on benign traffic only, and the alarm threshold is
+%   the 99th percentile of benign validation scores.
+%   Datasets: 'CARHACK' (Car-Hacking), 'OTIDS', 'CIC' (CICIoV2024, decimal).
+%   Set dataset_mode and attack_filename in section 0 and run the script
+%   from the folder holding the dataset files. It writes ROC and PR figures
+%   and rawscores_<dataset>_<attack>.mat to that folder.
+
 %% ==========================================
 % 0. CONFIGURATION & LOADING
 % ==========================================

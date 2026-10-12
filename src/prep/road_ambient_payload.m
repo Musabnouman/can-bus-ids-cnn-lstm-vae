@@ -1,3 +1,8 @@
+% ROAD_AMBIENT_PAYLOAD  Build the benign ROAD matrix for payload_vae_road.m.
+%   Reads the 12 ambient_*.log captures, keeps the first 30% of each
+%   (chronologically), stacks them and saves the 8 payload bytes per frame
+%   as ambient_diverse_30pct.mat in the current folder.
+
 %% ==========================================
 % ROAD DATASET: AMBIENT CONCATENATOR (PROPER 30% SAMPLING)
 % ==========================================
