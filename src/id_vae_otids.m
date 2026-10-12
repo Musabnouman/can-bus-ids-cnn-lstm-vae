@@ -1,7 +1,8 @@
 %% ==========================================
 % 0. CONFIGURATION & LOADING
 % ==========================================
- clear; clc; 
+clear; clc; 
+rng(42);   % fixed seed: shuffling, sampling and initialisation repeat
 
 dataset_mode = 'OTIDS';              
 attack_filename = 'Fuzzy_attack_dataset.txt'; 
@@ -353,7 +354,10 @@ function [loss, gradE, gradD, gradEmbed] = modelGradients(netE, netD, id_seq, da
     % 1. Embedding lookup (inside tape — gradient flows to embedTable)
     id_idx_flat = max(1, min(round(id_seq(:)) + 1, num_unique_ids + 1));
     embed_flat  = embedTable(id_idx_flat, :);           % [W*B x embedDim] dlarray
-    embed_seq   = reshape(embed_flat, W, embedDim, current_batch);  % [W x embedDim x B]
+    % Rows of embed_flat run time-fastest, then window: reshape to W x B x E
+    % and move E forward. reshape(embed_flat, W, embedDim, B) would mix
+    % embedding values from different windows.
+    embed_seq   = permute(reshape(embed_flat, W, current_batch, embedDim), [1 3 2]);  % [W x embedDim x B]
 
     % 2. Extract targets from RAW arrays BEFORE any dlarray labeling
     %    This avoids all CTB indexing ambiguity
@@ -420,7 +424,7 @@ end
 % 
 %         % Embedding lookup
 %         embed_flat = embTable_data(id_indices_3d(:), :);              % [W*B x embedDim]
-%         embed_seq  = reshape(embed_flat, W, embedDim, current_batch); % [W x embedDim x B]
+%         embed_seq  = permute(reshape(embed_flat, W, current_batch, embedDim), [1 3 2]); % [W x embedDim x B]
 % 
 %         % --- Target: extract last time step from raw arrays (no dlarray indexing) ---
 %         embed_target = reshape(embed_seq(end, :, :), embedDim, current_batch); % [embedDim x B]
@@ -582,7 +586,7 @@ function scores = scoreOnTheFly(netE, netD, X_rows, embedTable, ...
 
         % Embedding lookup
         embed_flat = embData(id_idx_3d(:), :);
-        embed_seq  = reshape(embed_flat, W, embedDim, current_batch);
+        embed_seq  = permute(reshape(embed_flat, W, current_batch, embedDim), [1 3 2]);  % [W x embedDim x B]
 
         % Target = last time step (raw arrays, no dlarray)
         embed_target = reshape(embed_seq(end,:,:), embedDim, current_batch);

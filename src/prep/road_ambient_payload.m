@@ -3,11 +3,12 @@
 % ==========================================
 clear; clc;
 
-% 1. FORCE MATLAB TO LOOK IN THE RIGHT FOLDER
-cd('C:\Users\musab\Desktop\road dataset\ambient');
+% 1. Folder holding ROAD's ambient_*.log captures (edit to match your copy).
+%    The .mat file is written to the current folder.
+ambient_dir = fullfile('road dataset', 'ambient');
 
 % 2. Find all ambient log files in the directory
-files = dir('ambient_*.log');
+files = dir(fullfile(ambient_dir, 'ambient_*.log'));
 num_files = length(files);
 
 if num_files < 12
@@ -22,7 +23,7 @@ for i = 1:num_files
     fname = files(i).name;
     fprintf('Parsing [%d/%d]: %s... ', i, num_files, fname);
     
-    fid = fopen(fname, 'r');
+    fid = fopen(fullfile(ambient_dir, fname), 'r');
     raw = textscan(fid, '%*s %*s %s', 'Delimiter', ' ', 'MultipleDelimsAsOne', true);
     fclose(fid);
     

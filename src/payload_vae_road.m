@@ -2,6 +2,7 @@
 % 0. CONFIGURATION & LOADING
 % ==========================================
 clear; clc; 
+rng(42);   % fixed seed: shuffling, sampling and initialisation repeat
 
 dataset_mode = 'ROAD';              
 attack_filename = 'fuzzing_attack_1.log'; 
@@ -523,8 +524,11 @@ function [loss, gradE, gradD] = modelGradients(netE, netD, X, latentDim, W, kl_w
     % Input:  Steps 1 to W-1
     % Target: Step W (The immediate next value)
     
-    X_in     = X(:, 1:end-1, :);   
-    X_target = squeeze(X(:, end, :));   
+    % A formatted dlarray is stored in 'SCBTU' order, so this 'CTB' batch is
+    % held as C x B x T. Time is the 3rd dimension; indexing the 2nd one
+    % would pick windows of the batch instead of time steps.
+    X_in     = X(:, :, 1:end-1);              % C x B x (W-1): steps 1..W-1
+    X_target = stripdims(X(:, :, end));       % C x B: step W
     
     Zstats = forward(netE, X_in);
     Zstats = reshape(Zstats, 2*latentDim, []);
@@ -536,7 +540,7 @@ function [loss, gradE, gradD] = modelGradients(netE, netD, X, latentDim, W, kl_w
     Z = mu + sigma .* epsilon;
     
     % Decoder predicts the NEXT step based on latent Z
-    X_pred = forward(netD, dlarray(Z,'CB')); 
+    X_pred = stripdims(forward(netD, dlarray(Z,'CB')));   % C x B
     
     mse = mean((X_target - X_pred).^2, 'all');
     kl = -0.5 * mean(sum(1 + logVar - mu.^2 - exp(logVar), 1), 'all');
@@ -548,7 +552,7 @@ end
 
 function scores = getAnomalyScoreBatched(netE, netD, X_cells, latentDim, W, kl_weight, batchSize, g_mu, g_sig)
     n = numel(X_cells);
-    scores = zeros(n,1);
+    scores = nan(n,1);   % NaN, not 0: a window that is never scored must not pass as benign
     nFeatures = size(X_cells{1},2);
 
     for i = 1:batchSize:n
@@ -558,18 +562,14 @@ function scores = getAnomalyScoreBatched(netE, netD, X_cells, latentDim, W, kl_w
         X_mat = (X_mat - reshape(g_mu, [1, nFeatures, 1])) ./ ...
                           reshape(g_sig, [1, nFeatures, 1]);
 
-        X_dl = dlarray(permute(X_mat,[2 1 3]), 'CTB');   
-
-        % Extract Target (True Next Step)
-        X_last_dl = X_dl(:, end, :);        
-        X_target_dl = mean(X_last_dl, finddim(X_last_dl,'T')); 
-        X_target = extractdata(X_target_dl); 
+        % Split input and target on the raw W x C x B array, before any
+        % dlarray labelling ('CTB' is stored as C x B x T, see modelGradients).
+        X_target = reshape(X_mat(end, :, :), nFeatures, []);              % C x B: step W
+        X_in_dl  = dlarray(permute(X_mat(1:end-1, :, :), [2 1 3]), 'CTB'); % steps 1..W-1
 
         % Encoder -> mu, logVar
-        X_in_dl = X_dl(:, 1:end-1, :);         
-        Zstats_dl = predict(netE, X_in_dl);     
-        Zstats_dl = mean(Zstats_dl, finddim(Zstats_dl,'T')); 
-        Zstats = extractdata(Zstats_dl);        
+        Zstats = extractdata(predict(netE, X_in_dl));
+        Zstats = reshape(Zstats, 2*latentDim, []);
         mu     = Zstats(1:latentDim,:);
         logVar = Zstats(latentDim+1:end,:);
         
@@ -586,8 +586,9 @@ function scores = getAnomalyScoreBatched(netE, netD, X_cells, latentDim, W, kl_w
         
         batch_scores = mse + kl_weight * kl_terms;
         
-        current_batch = numel(batch_scores);   
-        scores(i:i+current_batch-1) = batch_scores(:);
+        assert(numel(batch_scores) == j-i+1, ...
+            'Scored %d windows in a batch of %d.', numel(batch_scores), j-i+1);
+        scores(i:j) = batch_scores(:);
     end
 end
 
