@@ -111,9 +111,9 @@ Each script prints the window counts, the per-epoch losses, the threshold, and a
 
 ## Development notes
 
-An earlier version of the payload scripts reported an AUC of about 0.998 on every Car-Hacking, OTIDS and CICIoV2024 attack it was run on, with recall 0.998046 each time. That uniformity was the clue: 0.998046 = 1 - 1/512, and 512 was the scoring batch size. MATLAB stores a `'CTB'`-formatted `dlarray` as channel × batch × time, so `X(:, end, :)` picked the last window of the batch instead of the last time step. Every window in a 512-window batch was therefore scored against one shared target, and the last window of each batch was never scored at all.
+An earlier version of the payload scripts reported an AUC of about 0.998 on every Car-Hacking, OTIDS and CICIoV2024 attack it was run on, with recall 0.998046 each time, that uniformity was the clue: 0.998046 = 1 - 1/512, and 512 was the scoring batch size. MATLAB stores a `'CTB'`-formatted `dlarray` as channel × batch × time, so `X(:, end, :)` picked the last window of the batch instead of the last time step. Every window in a 512-window batch was therefore scored against one shared target, and the last window of each batch was never scored at all.
 
-The ID-embedding scripts had a second layout bug: a `reshape` in the embedding lookup mixed embedding values from different windows. Both bugs are fixed in commit `f2288cd`, and an assertion now checks that every window gets a score. The corrected scripts have not been re-run end to end yet.
+The ID-embedding scripts had a second layout bug: a `reshape` in the embedding lookup mixed embedding values from different windows. Both bugs are fixed in commit in this version, and an assertion now checks that every window gets a score. The corrected scripts have not been re-run end to end yet.
 
 ## Dataset references
 
@@ -125,12 +125,9 @@ The ID-embedding scripts had a second layout bug: a `reshape` in the embedding l
 
 ## Citation
 
-If you use this code, please cite it with the metadata in [`CITATION.cff`](CITATION.cff) (GitHub shows a "Cite this repository" button for it).
+If you use this code, please cite it with the metadata in [`CITATION.cff`](CITATION.cff).
 
 ## License
 
 MIT. See [LICENSE](LICENSE).
-
-## Author
-
-Musab Nouman
+]
